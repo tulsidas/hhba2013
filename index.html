@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	<title>Documentos Reactivos</title>
+
+	<link rel="stylesheet" href="css/TangleKit.css" type="text/css">
+	<link rel="stylesheet" href="css/reveal.css">
+	<link rel="stylesheet" href="css/theme/simple.css" id="theme">
+   <!-- For syntax highlighting -->
+   <link rel="stylesheet" href="css/monokai.css">
+		
+	<script type="text/javascript" src="js/Tangle.js"></script>
+	<script type="text/javascript" src="js/mootools.js"></script>
+	<script type="text/javascript" src="js/TangleKit/sprintf.js"></script>
+	<script type="text/javascript" src="js/TangleKit/BVTouchable.js"></script>
+	<script type="text/javascript" src="js/TangleKit/TangleKit.js"></script>
+	<script type="text/javascript" src="js/mootools-adapter.js"></script>
+	<script type="text/javascript" src="js/highcharts.js"></script>
+	<script type="text/javascript">
+	   var MINS_POR_AÑO = 525949;
+	   var MINS_POR_MES = 43829;
+	   var MINS_POR_DIA = 1440;
+
+      Tangle.formats.tiempo = function (value) {
+         var orig = value;
+         var años = 0;
+         var meses = 0;
+         var dias = 0;
+         
+         if (value >= MINS_POR_AÑO) {
+            años = Math.floor(value / MINS_POR_AÑO);
+            value -= años * MINS_POR_AÑO;
+         }
+
+         if (value >= MINS_POR_MES) {
+            meses = Math.floor(value / MINS_POR_MES);
+            value -= meses * MINS_POR_MES;
+         }
+
+         if (value >= MINS_POR_DIA) {
+            dias = Math.floor(value / MINS_POR_DIA);
+            value -= dias * MINS_POR_DIA;
+         }
+
+         var str = "";
+         var vars = [];
+         
+         if (años > 0) {
+            str += "%d año" + (años >= 2 ? "s" : "");
+            vars.push(años);
+         }
+         if (meses > 0) {
+            str += (años > 0 ? "," : "") + " %d mes" + (meses >= 2 ? "es" : "");
+            vars.push(meses);
+         }
+         if (dias > 0) {
+            str += (meses > 0 || años > 0 ? " y" : "") + " %d día" + (dias >= 2 ? "s" : "");
+            vars.push(dias);
+         }
+
+         return vsprintf(str, vars);
+      };
+      
+      Tangle.formats.metric = function (value) {
+         var division = 1, modifier = "";
+         if (value >= 1e12) {
+            division = 1e12;
+            modifier = "T";
+         }
+         else if (value >= 1e9) {
+            division = 1e9;
+            modifier = "G";
+         }
+         else if (value >= 1e6) {
+            division = 1e6;
+            modifier = "M";
+         }
+         else if (value >= 1e3) {
+            division = 1e3;
+            modifier = "k";
+         }
+
+         return sprintf("%.2f", value/division) + " " + modifier;
+      };
+
+	</script>
+
+	<!-- example -->
+	<script type="text/javascript">
+		window.addEvent('domready', function() {
+			new Tangle(document.getElementById("cigarrillos1"), {
+				initialize: function () {
+					this.cant_cigarrillos = 20;
+					this.años = 20;
+				},
+				update: function () {
+					this.minutos = this.cant_cigarrillos * this.años * 365 * 5;
+				}
+			});
+
+			new Tangle(document.getElementById("cigarrillos2"), {
+				initialize: function () {
+					this.cant_cigarrillos = 20;
+					this.años = 20;
+					this.tipo_resultado = 0;
+				},
+				update: function () {
+					this.res_minutos = this.cant_cigarrillos * this.años * 365 * 5;
+					this.res_dias = this.res_minutos / 1440;
+					this.res_meses = this.res_dias / 30;
+					this.res_años = this.res_dias / 365.25;
+				}
+			});
+
+			new Tangle(document.getElementById("cigarrillos3"), {
+				initialize: function () {
+					this.cant_cigarrillos = 20;
+					this.años = 20;
+					this.mins_por_cigarrillo = 5;
+					this.tipo_resultado = 0;
+				},
+				update: function () {
+					this.res_minutos = this.cant_cigarrillos * this.años * 365 * this.mins_por_cigarrillo;
+					this.res_dias = this.res_minutos / 1440;
+					this.res_meses = this.res_dias / 30;
+					this.res_años = this.res_dias / 365.25;
+				}
+			});
+
+         var chart = new Highcharts.Chart({
+            chart: {
+               renderTo: 'container',
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false
+            },
+            title: {
+                text: 'Familia De La Mar'
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: { enabled: true }
+                }
+            },
+            series: [{
+                type: 'pie',
+                name: 'Cantidad de cerditos',
+                data: [
+                    ['Juan',   5],
+                    ['Paco',   10],
+                    ['Pedro',  20]
+                ]
+            }]
+        });
+         
+			new Tangle(document.getElementById("grafico"), {
+				initialize: function () {
+					this.juan = 5;
+					this.paco = 10;
+					this.pedro = 20;
+				},
+				update: function () {
+				   chart.series[0].setData([
+				      ['Juan', this.juan], 
+				      ['Paco', this.paco], 
+				      ['Pedro', this.pedro]
+			      ]);
+				}
+			});
+			
+			new Tangle(document.getElementById("acotando"), {
+				initialize: function () {
+					this.dias = 15;
+				},
+				update: function () {
+				   this.total = this.dias * 12;
+				}
+			});
+
+			new Tangle(document.getElementById("numberField"), {
+				initialize: function () {
+					this.dias = 15;
+				},
+				update: function () {
+				   this.total = this.dias * 12;
+				}
+			});
+
+			new Tangle(document.getElementById("acotando2"), {
+				initialize: function () {
+					this.dias = 15;
+				},
+				update: function () {
+				   this.porcentaje = this.dias / 30 * 100;
+				}
+			});
+
+			new Tangle(document.getElementById("acotando3"), {
+				initialize: function () {
+					this.dias = 15;
+				},
+				update: function () {
+				   this.porcentaje = this.dias / 30 * 100;
+				}
+			});
+
+         var houses = 13333333; // 40M / 3
+			new Tangle(document.getElementById("ecofacts"), {
+				initialize: function () {
+               this.percent_house = 0.5;
+               this.cant_lights = 1;
+               this.cant_watts = 60;
+				},
+				update: function () {
+               this.tol_saved_wh = houses * this.percent_house * this.cant_lights * this.cant_watts * 2920; // 8 hours/day/year 
+				}
+			});
+
+			new Tangle(document.getElementById("ecofacts2"), {
+				initialize: function () {
+               this.percent_house = 0.5;
+               this.cant_lights = 1;
+               this.cant_watts = 60;
+				},
+				update: function () {
+               this.tol_saved_wh = houses * this.percent_house * this.cant_lights * this.cant_watts * 2920; // 8 hours/day/year 
+				}
+			});
+
+		});
+	</script>
+</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<div class="slides">
+
+				<section data-background="orange" style="background: rgba(255, 255, 255, 0.7);">
+				   <h2>documentos reactivos</h2>
+					 <p>&nbsp;</p>
+					 <p>requete re activos</p>
+				</section>
+
+				<section data-background="Images/cigarette.jpg" style="background: rgba(255, 255, 255, 0.7);">
+				   <h3>Cada cigarrillo te quita 5 minutos de vida</h3>
+				</section>
+
+				<section data-background="Images/cigarette.jpg" style="background: rgba(255, 255, 255, 0.7);">
+				   <p>fumar 20 cigarrillos por día durante 20 años te quita</p>
+				   <p>20 &times; 365 &times; 20 &times; 5 = 730.000 minutos de vida</p>
+				   <p>≅ 1 año, 4 meses y 19 días</p>
+				</section>
+
+				<section data-background="Images/cigarette.jpg" style="background: rgba(255, 255, 255, 0.7);">
+				   <h2>¡tomá mate!</h2>
+				</section>
+
+				<section data-background="Images/cigarette.jpg" style="background: rgba(255, 255, 255, 0.7);">
+				   pero yo fumo hace menos que 20 años... ¿cuánto me sacó a mi?
+				</section>
+
+				<section data-background="Images/cigarette.jpg">
+				   <img src="Images/confused.jpg">
+				</section>
+
+				<section data-background="Images/cigarette.jpg">
+				   <img src="Images/tabla1.png">
+				</section>
+
+				<section data-background="Images/cigarette.jpg" style="background: rgba(255, 255, 255, 0.7);">
+				   ¡pero yo no fumo 20 por día!
+				</section>
+
+				<section data-background="Images/cigarette.jpg">
+				   <img src="Images/confused2.jpg">
+				</section>
+
+				<section data-background="Images/cigarette.jpg">
+				   <img src="Images/tabla2.png">
+				</section>
+
+				<section data-background="Images/cigarette.jpg">
+				   <img src="Images/confused3.jpg">
+				</section>
+
+				<section data-background="Images/cigarette.jpg" style="background: rgba(255, 255, 255, 0.7);">
+				   <p>con ustedes</p>
+				   <h2>Tangle</h2>
+				   <p><a href="http://worrydream.com/Tangle/">http://worrydream.com/Tangle/</a></p>
+				</section>
+
+				<section data-background="Images/cigarette.jpg" style="background: rgba(255, 255, 255, 0.7)">
+               <div id="cigarrillos1">
+	               <h3>Cada cigarrillo te quita 5 minutos de vida</h3>
+	               
+	               <p>
+		               Fumar <span data-var="cant_cigarrillos" class="TKAdjustableNumber" data-min="0" data-max="40"> cigarrillos</span>
+		               por día durante <span data-var="años" class="TKAdjustableNumber" data-min="1" data-max="50"> años</span> te quita
+	               </p>
+		               <strong><span data-var="minutos"> minutos</span> de vida</strong>
+	            </div>
+				</section>
+
+				<section data-background="Images/cigarette.jpg" style="background: rgba(255, 255, 255, 0.7)">
+               <div id="cigarrillos2">
+	               <h3>Cada cigarrillo te quita 5 minutos de vida</h3>
+	               
+	               <p>
+		               Fumar <span data-var="cant_cigarrillos" class="TKAdjustableNumber" data-min="0" data-max="40"> cigarrillos</span>
+		               por día durante <span data-var="años" class="TKAdjustableNumber" data-min="1" data-max="50"> años</span> te quita
+	               </p>
+                  <span data-var="tipo_resultado" class="TKSelect TKSwitch">
+                     <span data-var="res_minutos"> minutos</span>
+                     <span data-var="res_dias" data-format="%.2f"> días</span>
+                     <span data-var="res_meses" data-format="%.2f"> meses</span>
+                     <span data-var="res_años" data-format="%.2f"> años</span>
+                  </span> de vida
+	            </div>
+				</section>
+
+				<section data-background="Images/cigarette.jpg" style="background: rgba(255, 255, 255, 0.7);">
+				   y ya que estamos...
+				</section>
+
+				<section data-background="Images/cigarette.jpg" style="background: rgba(255, 255, 255, 0.7)">
+               <div id="cigarrillos3">
+	               <h3>Cada cigarrillo te saca <span data-var="mins_por_cigarrillo" class="TKAdjustableNumber" data-min="1" data-max="60"> minutos</span> de vida</h3>
+	               
+	               <p>
+		               Fumar <span data-var="cant_cigarrillos" class="TKAdjustableNumber" data-min="0" data-max="40"> cigarrillos</span>
+		               por día durante <span data-var="años" class="TKAdjustableNumber" data-min="1" data-max="50"> años</span> te quita
+	               </p>
+                  <span data-var="tipo_resultado" class="TKSelect TKSwitch">
+                     <span data-var="res_minutos"> minutos</span>
+                     <span data-var="res_dias" data-format="%.2f"> días</span>
+                     <span data-var="res_meses" data-format="%.2f"> meses</span>
+                     <span data-var="res_años" data-format="%.2f"> años</span>
+                  </span> de vida
+	            </div>
+				</section>
+
+				<section>
+				   <p>texto... ¡y mucho más!</p>
+               <img src="Images/vendedor.jpg">
+				</section>
+
+				<section style="background: rgba(255, 255, 255, 0.7);">
+				   <div id="grafico">
+				      Juan tiene <span data-var="juan" class="TKAdjustableNumber" data-min="0" data-max="30"></span>,
+				      Paco tiene <span data-var="paco" class="TKAdjustableNumber" data-min="0" data-max="30"></span>
+				       y Pedro tiene <span data-var="pedro" class="TKAdjustableNumber" data-min="0" data-max="30"></span>
+				      <div id="container" style="height: 500px"></div>
+				   </div>
+				</section>
+
+			   <section>
+			      <p>Tormenta de cerebros</p>
+			      <p><small>¿en qué podemos usar esto?</small></p>
+               <img src="Images/brainstorming.jpg">
+			   </section>
+
+				<section data-background="black">
+               <img src="Images/showme.jpg">
+			   </section>
+			   
+            <section>
+                <pre> <code data-trim class="html">
+<div id="un_div">
+Fumar <span data-var="cigarrillos" class="TKAdjustableNumber" > cigarrillos</span>
+por día durante <span data-var="años" class="TKAdjustableNumber"> años</span>
+te quita <span data-var="minutos"> minutos</span> de vida
+</div>
+                </code> </pre>
+            </section>
+
+            <section>
+                <pre> <code data-trim class="html">
+new Tangle(document.getElementById("un_div"), {
+   initialize: function () {
+      this.cant_cigarrillos = 20;
+      this.años = 20;
+   },
+   update: function () {
+      this.minutos = this.cant_cigarrillos * this.años * 365 * 5;
+   }
+});
+                </code> </pre>
+            </section>
+
+            <section>
+               <p>acotar los valores</p>
+                <pre> <code data-trim class="html">
+<span data-var="dias" class="TKAdjustableNumber" data-min="0" data-max="30"></span>
+               </code> </pre>
+               <div id="acotando">
+                  <span data-var="dias" class="TKAdjustableNumber" data-min="0" data-max="30"> días</span>
+                  al mes son <span data-var="total"> días</span> por año
+               </div>
+            </section>
+
+            <section>
+               <p>TKNumberField</p>
+                <pre> <code data-trim class="html">
+<span data-var="dias" class="TKNumberField" data-size="3"></span>
+                </code> </pre>
+               <div id="numberField">
+                  <span data-var="dias" class="TKNumberField" data-size="3"> días al mes</span>
+                  al mes son <span data-var="total"> días</span> por año
+               </div>
+            </section>
+
+            <section>
+                <pre> <code data-trim class="html">
+<span data-var="dias" class="TKAdjustableNumber" data-min="0" data-max="30"></span>
+               </code> </pre>
+               <div id="acotando2">
+                  <span data-var="dias" class="TKAdjustableNumber" data-min="0" data-max="30"> días</span>
+                  al mes es el <span data-var="porcentaje">%</span> del tiempo
+               </div>
+            </section>
+
+            <section data-background="pink">
+               <h1>formatos</h1>
+            </section>
+
+            <section>
+               <p>data-format</p>
+                <pre> <code data-trim class="html">
+<span data-var="porcentaje" data-format="%.2f"></span> % del tiempo
+               </code> </pre>
+               <div id="acotando3">
+                  <span data-var="dias" class="TKAdjustableNumber" data-min="0" data-max="30"> días</span>
+                  al mes es el <span data-var="porcentaje" data-format="%.2f"></span> % del tiempo
+               </div>
+            </section>
+            
+            <section data-background="lightgreen">
+               <div id="ecofacts">
+               <p>
+                  Si el <span data-var="percent_house" class="TKAdjustableNumber" 
+                     data-min="0" data-max="1" data-format="percent" data-step="0.05"></span> 
+                  de los hogares de Argentina apagaran
+                  <span data-var="cant_lights" class="TKAdjustableNumber" 
+                     data-min="0" data-max="6"></span> 
+                  lamparitas de
+                  <span data-var="cant_watts" class="TKAdjustableNumber" 
+                     data-min="20" data-max="150" data-step="10"></span> watts, eso ahorraría
+                  <span data-var="tol_saved_wh" data-format="%d"></span> Wh por año
+               </p>
+               </div>
+            </section>
+
+				<section data-background="lightgreen">
+				   <img src="Images/confused4.jpg">
+				</section>
+				
+            <section>
+               <p>Tangle.formats</p>
+                <pre> <code data-trim class="html">
+Tangle.formats.metric = function (value) {
+   var division = 1, modifier = "";
+   if (value >= 1e12) {
+      division = 1e12;
+      modifier = "T";
+   }
+   else if (value >= 1e9) {
+      division = 1e9;
+      modifier = "G";
+   }
+   else if (value >= 1e6) {
+      division = 1e6;
+      modifier = "M";
+   }
+   else if (value >= 1e3) {
+      division = 1e3;
+      modifier = "k";
+   }
+
+   return sprintf("%.2f", value/division) + " " + modifier;
+};
+               </code> </pre>
+            </section>
+
+            <section data-background="lightgreen">
+                <pre> <code data-trim class="html">
+                  <span data-var="tol_saved_wh" data-format="metric"></span>Wh por año
+               </code> </pre>
+               <div id="ecofacts2">
+               <p>
+                  Si el <span data-var="percent_house" class="TKAdjustableNumber" 
+                     data-min="0" data-max="1" data-format="percent" data-step="0.05"></span> 
+                  de los hogares de Argentina apagaran
+                  <span data-var="cant_lights" class="TKAdjustableNumber" 
+                     data-min="0" data-max="6"></span> 
+                  lamparitas de
+                  <span data-var="cant_watts" class="TKAdjustableNumber" 
+                     data-min="20" data-max="150" data-step="10"></span> watts, eso ahorraría
+                  <span data-var="tol_saved_wh" data-format="metric"></span>Wh por año
+               </p>
+               </div>
+            </section>
+
+			   <section data-background="grey" style="background: rgba(255, 255, 255, 0.7);">
+			      <blockquote>How do we make readers <strong>demand</strong> explorable explanations, and <strong>reject</strong> static text?</blockquote>
+			      <p><small>&mdash; Bret Victor</small></p>
+			   </section>
+
+			   <section data-background="grey" style="background: rgba(255, 255, 255, 0.7);">
+			      <h1>FIN</h1>
+			      <p>&mdash;</p>
+			      <p><a href="https://twitter.com/@quixote_arg">@quixote_arg</a></p>
+			      <p><a href="https://github.com/tulsidas/hhba2013">https://github.com/tulsidas/hhba2013</a></p>
+			      <p><small>Licencia WTFPL</small></p>
+			   </section>
+
+			</div>
+		</div>
+
+		<script src="js/head.min.js"></script>
+		<script src="js/reveal.min.js"></script>
+
+		<script>
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				center: true,
+				controls: false,
+				width: 1200,
+				height: 600,
+
+				transition: 'linear',
+				transitionSpeed: 'slow',
+				
+				dependencies: [{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }]
+			});
+		</script>
+	</body>
+
+<!--
+(Photo: Vjeran Lisjak/sxc.hu)
+-->
+
+</body>
+</html>
